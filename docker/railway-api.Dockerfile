@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim
+FROM node:20-bookworm-slim
 
 RUN apt update && apt -y install python3 make gcc g++ && rm -rf /var/lib/apt/lists/*
 
