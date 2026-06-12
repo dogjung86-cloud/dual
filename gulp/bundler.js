@@ -62,6 +62,8 @@ bundler.transform(envify({
   VERSION: version,
   API_URL: config.get('api'),
   FIREBASE_URL: config.get('firebase.url'),
+  SP_SERVER_URL: process.env.SP_SERVER_URL || '',
+  GAME_SERVER_URL: process.env.GAME_SERVER_URL || '',
   ALL_CARDS_AVAILABLE: config.get('allCardsAvailable'),
   AI_TOOLS_ENABLED: config.get('aiToolsEnabled'),
   RECORD_CLIENT_LOGS: config.get('recordClientLogs'),

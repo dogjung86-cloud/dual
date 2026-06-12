@@ -58,21 +58,27 @@ class NetworkManager
       TelemetryManager.getInstance().setSignal("game","connecting")
       token = Storage.get('token')
 
-      # Determine which WebSocket protocol to use.
-      # Use secure WebSockets in staging and production.
-      env = process.env.NODE_ENV || 'development'
-      protocol = if env == 'development' then 'ws' else 'wss'
+      isSinglePlayer = GameType.isSinglePlayerGameType(gameType)
+      configuredWebsocketUrl = if isSinglePlayer then process.env.SP_SERVER_URL else process.env.GAME_SERVER_URL
 
-      # Determine which WebSocket host to use.
-      # Use the assigned game server if one was provided.
-      host = if gameServerAddress? then gameServerAddress else window.location.hostname
+      if configuredWebsocketUrl
+        websocketUrl = configuredWebsocketUrl
+      else
+        # Determine which WebSocket protocol to use.
+        # Use secure WebSockets in staging and production.
+        env = process.env.NODE_ENV || 'development'
+        protocol = if env == 'development' then 'ws' else 'wss'
 
-      # Determine which WebSocket port to use.
-      # SP modes use port 8000; MP modes use port 8001.
-      port = if GameType.isSinglePlayerGameType(gameType) then 8000 else 8001
+        # Determine which WebSocket host to use.
+        # Use the assigned game server if one was provided.
+        host = if gameServerAddress? then gameServerAddress else window.location.hostname
 
-      # Format the WebSocket URL.
-      websocketUrl = "#{protocol}://#{host}:#{port}"
+        # Determine which WebSocket port to use.
+        # SP modes use port 8000; MP modes use port 8001.
+        port = if isSinglePlayer then 8000 else 8001
+
+        # Format the WebSocket URL.
+        websocketUrl = "#{protocol}://#{host}:#{port}"
       Logger.module("SDK").warn "NetworkManager: connecting to game server #{websocketUrl}"
 
       # connect using socket.io manager
