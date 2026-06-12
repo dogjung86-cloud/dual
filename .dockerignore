@@ -9,6 +9,8 @@ app/audio
 !app/audio/**
 app/original_resources
 app/replay
+!app/replay
+!app/replay/**
 app/resources
 !app/resources
 !app/resources/**
