@@ -50,10 +50,29 @@ class Session extends EventEmitter
     debug("_networkError: #{e.message}")
     throw new Error('Please try again')
 
+  _decodeJwtPayload: (token) ->
+    try
+      payload = token.split('.')[1]
+      payload = payload.replace(/-/g, '+').replace(/_/g, '/')
+      while payload.length % 4 != 0
+        payload += '='
+      return JSON.parse(atob(payload))
+    catch e
+      debug("_decodeJwtPayload: #{e.message}")
+      return {}
+
   _authFirebase: (token) ->
     debug('authFirebase')
     return new Promise (resolve, reject) =>
       @fbRef = new Firebase(@fbUrl)
+      if process.env.SKIP_FIREBASE_CLIENT_AUTH == 'true'
+        decodedToken = @_decodeJwtPayload(token)
+        return resolve({
+          auth:
+            id: decodedToken.d?.id
+            username: decodedToken.d?.username
+          expires: decodedToken.exp
+        })
       @fbRef.authWithCustomToken token, (err, res) ->
         debug('authWithCustomToken')
         if err then return reject(err)
